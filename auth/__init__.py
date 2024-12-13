@@ -22,7 +22,7 @@ def verificar_email(email):
     return '@' in email and email.endswith('.com')
 
 
-def verificar_login(email, senha, users):
+"""def verificar_login(email, senha, users):
     for usuario, detalhes in users.items():
         if usuario == email and detalhes['senha'] == senha:
             print(f'Login realizado com sucesso\n'
@@ -30,26 +30,7 @@ def verificar_login(email, senha, users):
                   f'Seja bem-vindo {detalhes['nome']}!')
             return usuario
     print('Verifique o login')
-    return False
-
-
-def login_db(email, senha):
-    conexao = conectardb()
-    cursor = conexao.cursor()
-    cursor.execute(f"SELECT email, senha, nome, idade, profissao, estado, id_usuario FROM usuarios WHERE email = '{email}' ")
-    usuario = cursor.fetchall()
-    cursor.close()
-    conexao.close()
-    if usuario:
-        print(usuario)
-        if usuario[0][1] == senha:
-            print('Login validado com sucesso!')
-            return usuario
-        else:
-            print('Senha inválida')
-            return False
-    else:
-        print('Usuario não encontrado, verifique seu login')
+    return False"""
 
 
 def verify_creator(usuario, resultados):

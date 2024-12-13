@@ -2,7 +2,6 @@ from dao import *
 import datetime
 from auth import *
 import random
-import string
 import json
 
 
@@ -612,7 +611,6 @@ def remover_inscricao(usuario):
         if resultado_inscricao:
             print(f"O usuário está inscrito no evento '{nome_evento}'.")
 
-
             confirmacao = input("Você deseja realmente remover sua inscrição desse evento? (s/n): ").strip().lower()
             if confirmacao == 's':
                 cursor.execute("""
@@ -679,20 +677,6 @@ def listar_eventos_inscritos(usuario):
     finally:
         cursor.close()
         conexao.close()
-
-
-def listar_eventos_criados(usuario):
-    conexao = conectardb()
-    cursor = conexao.cursor()
-
-    cursor.execute("""
-                SELECT nome_evento
-                FROM eventos
-                WHERE criador = %s
-            """, (usuario[0][0],))
-    eventos = cursor.fetchall()
-
-    return eventos
 
 
 def listar_participantes_evento(usuario):

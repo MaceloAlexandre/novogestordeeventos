@@ -1,19 +1,19 @@
-from auth import *
 import random
 import string
 import json
-from eventos import listar_eventos_criados
 import plotly.graph_objects as go
 import plotly.subplots as sp
 import webbrowser
 import os
+from dao import *
+import datetime
 
 
 def gerar_codigo_cupom():
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
 
 
-def adicionar_cupom(usuario):
+def adicionar_cupom_antigo(usuario):
 
     conexao = conectardb()
     cursor = conexao.cursor()
@@ -481,3 +481,83 @@ def obter_e_gerar_grafico_estatisticas_avancadas(usuario):
     finally:
         cursor.close()
         conexao.close()
+
+
+def capturar_infos_cupom(usuario):
+    """Captura informações do usuário e adiciona um cupom associado a um evento."""
+    try:
+        eventos = listar_eventos_criados(usuario)
+
+        if not eventos:
+            print("Você não possui eventos cadastrados.")
+            return None
+
+        print("\n--- Eventos Criados por Você ---")
+        for evento in eventos:
+            print(f"- {evento[0]}")
+
+        nome_evento = input("Informe o nome do evento ao qual o cupom será associado: ").strip()
+        email_user = usuario[0][0]
+        print(email_user)
+        if verificar_criador_evento(nome_evento, email_user):
+            print('Você é o criador desse evento!')
+        else:
+            return
+        # Captura informações do cupom
+        codigo = input("Informe o código do cupom (máximo 20 caracteres, letras e números): ").strip()
+        if len(codigo) > 20 or not codigo.isalnum():
+            raise ValueError("O código deve ter no máximo 20 caracteres sendo apenas letras e números.")
+
+        valor = float(input("Informe o valor do desconto (apenas números): ").strip())
+
+        # Validação direta do tipo de desconto
+        tipo_desconto = input("Informe o tipo de desconto ('fixo' ou 'percentual'): ").strip().lower()
+        while tipo_desconto not in ['fixo', 'percentual']:
+            print("Tipo de desconto inválido! Insira 'fixo' ou 'percentual'.")
+            tipo_desconto = input("Informe o tipo de desconto ('fixo' ou 'percentual'): ").strip().lower()
+
+        data_expiracao = input("Informe a data de expiração (YYYY-MM-DD): ").strip()
+        data_expiracao_datetime = datetime.datetime.strptime(data_expiracao, '%d/%m/%Y')
+        if data_expiracao_datetime <= datetime.datetime.now():
+            raise ValueError("A data de expiração deve ser uma data futura.")
+
+        quantidade_maxima = int(input("Informe a quantidade máxima de usos do cupom (máximo 1000): ").strip())
+        if quantidade_maxima > 1000:
+            raise ValueError("A quantidade máxima de usos não deve ser maior que 1000.")
+
+        # Confirma os dados inseridos
+        print("\nResumo do cupom:")
+        print(f"Código: {codigo}")
+        print(f"Valor: {valor}")
+        print(f"Tipo de Desconto: {tipo_desconto}")
+        print(f"Data de Expiração: {data_expiracao}")
+        print(f"Quantidade Máxima de Usos: {quantidade_maxima}")
+        print(f"Nome do Evento: {nome_evento}")
+
+        confirmacao = input("\nDeseja salvar esse cupom? (s/n): ").strip().lower()
+        if confirmacao != 's':
+            print("Operação cancelada pelo usuário.")
+            return
+
+        # Chama a função que insere o cupom e atualiza o evento
+        adicionar_cupom(codigo, valor, tipo_desconto, data_expiracao, quantidade_maxima, nome_evento)
+
+    except ValueError as ve:
+        print(f"Erro de valor inválido: {ve}")
+    except Exception as e:
+        print(f"Erro inesperado: {e}")
+
+
+def adicionar_cupom(codigo, valor, tipo_desconto, data_expiracao, quantidade_maxima, nome_evento):
+    """Chama o DAO para inserir cupom e atualizar evento."""
+    try:
+        inserir_cupom_e_atualizar_evento(
+            codigo=codigo,
+            valor=valor,
+            tipo_desconto=tipo_desconto,
+            data_expiracao=data_expiracao,
+            quantidade_maxima=quantidade_maxima,
+            nome_evento=nome_evento
+        )
+    except Exception as e:
+        print(f"Erro ao adicionar cupom: {e}")

@@ -42,7 +42,7 @@ def menu_adm(usuario):
         elif opcao == '5':
             exibir_detalhes_evento(usuario)
         elif opcao == '6':
-            adicionar_cupom(usuario)
+            capturar_infos_cupom(usuario)
         elif opcao == '7':
             while True:
                 print('1 - Adicionar usuarios na lista de indesejados de seu evento')

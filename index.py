@@ -29,7 +29,7 @@ def menu_login():
 
             idade = int(input('Inisira sua idade: '))
             while idade <= 0:
-                idade = int(input('Idade inválida, Inisira sua idade: '))
+                idade = int(input('Idade inválida, Insira sua idade: '))
 
             profissao = input('Insira sua profissão: ')
 
@@ -39,8 +39,10 @@ def menu_login():
             while genero not in ['F', 'M', 'N']:
                 genero = input('Insira seu gênero: (F/M), caso não queira informar digite N.')
 
-            print('Usuário cadastrado com sucesso')
-            inserir_usuario(nome, email, senha, idade, profissao, estado, genero)
+            if inserir_usuario(nome, email, senha, idade, profissao, estado, genero):
+                print('Usuário cadastrado com sucesso!')
+            else:
+                print('Erro ao inserir usuario!')
 
         elif op == '2':
             email = input('Digite o seu email: ')
@@ -53,6 +55,8 @@ def menu_login():
             if usuario:
                 print(usuario)
                 menu_usuario(usuario)
+            else:
+                print('Login inválido, tente novamente')
 
         elif op == '0':
             print('_______________________\n'
